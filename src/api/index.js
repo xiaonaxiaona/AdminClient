@@ -26,6 +26,31 @@ export const reqCategory = (parentId) =>ajax(BASE + '/manage/category/list',{par
 //更新分类的名称
 export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', {categoryId, categoryName}, 'POST')
 
+//添加数据
+export const reqAddCategory = (parentId,categoryName) => ajax(BASE +'/manage/category/add',{parentId,categoryName},'POST')
+
+//获取商品分页列表【数组】
+export const reqProducts = ({pageNum , pageSize}) => ajax(BASE +'/manage/product/list',{pageNum,pageSize})
+
+//搜索商品分页列表----按名字 / 分类搜索
+export const reqSearchProducts = ({
+  pageNum ,
+  pageSize,
+  searchType,
+  searchName,
+}) => ajax(BASE + '/manage/product/search',{
+  pageNum ,
+  pageSize,
+  [searchType]: searchName,
+})
+//对象中的属性名，只要写上就是写死了  不能再改变了，但是套上[ ] 就不是死值了
+
+//对商品进行状态处理----进行上架/下架处理  在售/下架
+export const reqStateUpdate = (productId,status) => ajax(BASE + '/manage/product/updateStatus',{productId,status},'POST')
+
+
+
+
 //  简单测试一下的代码
 // reqLogin('admin','admin').then(result =>{
 //   console.log('result',result)

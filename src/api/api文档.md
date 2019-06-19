@@ -438,6 +438,7 @@
 ## 11. 根据ID/Name搜索产品分页列表
 ### 请求URL：
     http://localhost:5000/manage/product/search?pageNum=1&pageSize=5&productName=T
+                                              【问号后面的不写入路径中，只是告诉你这个形式】
 
 ### 请求方式：
     GET

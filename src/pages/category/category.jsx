@@ -4,7 +4,9 @@ import {Card,Button,Icon,Table,Modal,message} from 'antd'
 import IsButton from '../../components/isbutton'
 import {reqCategory} from '../../api'
 import UpdateForm from './update-form'
-import {reqUpdateCategory} from '../../api'
+import AddForm from './add-form'
+import {reqUpdateCategory, reqAddCategory } from '../../api'
+
 
 export default class Category extends Component {
 
@@ -42,12 +44,19 @@ state = {
   }
 
   //获取一级与二级列表
-  getFirstAndTwoColumns = async() =>{
+  getFirstAndTwoColumns = async(pid) =>{
 
     this.setState({loading:true})  //请求前显示loading
+    /*
     const {parentId} = this.state
     const result = await reqCategory(parentId)  //----获取的parentId的值，是会得到所有的1-2级的数组，
                                                   //因为2级的包在1级里面,先进入1级才会进入2级
+    */
+
+    //以下是在添加分类需要特殊做的
+    const parentId = pid || this.state.parentId
+    const result = await reqCategory(parentId) //添加分类---特殊用的
+
     this.setState({loading:false})
     if(result.status===0){
       // 得到的分类数组可能是一级的, 也可能是二级的
@@ -95,50 +104,90 @@ state = {
    /* 
   显示更新的界面
   */
- showUpdate = category => {
-  // 保存cateogory
-  this.category = category
-  // 更新状态
-  this.setState({
-    showStatus: 1
-  })
-}
+  showUpdate = category => {
+    // 保存cateogory
+    this.category = category
+    // 更新状态
+    this.setState({
+      showStatus: 1
+    })
+  }
 
-/* 
-更新分类
-*/
-updateCategory = () => {
-  // 进行表单验证
-  this.form.validateFields(async(err, values) => {
-    if (!err) { // 只有验证通过才继续
+  /* 
+  更新分类
+  */
+  updateCategory = () => {
+    // 进行表单验证-----子组件传递过来的form才能进行表单验证
+    this.form.validateFields(async(err, values) => {
+      if (!err) { // 只有验证通过才继续
 
-      // 1--隐藏修改界面
-      this.setState({
-        showStatus: 0
-      })
+        // 1--隐藏修改界面
+        this.setState({
+          showStatus: 0
+        })
 
-      // 2--得到输入的分类名称
-      const categoryName = this.form.getFieldValue('categoryName')
+        // 2--得到输入的分类名称
+        const categoryName = this.form.getFieldValue('categoryName')
 
-      // 3--重置输入数据
-      this.form.resetFields()
+        // 3--重置输入数据
+        this.form.resetFields()
 
-      // 4--得到分类的_id
-      const categoryId = this.category._id
+        // 4--得到分类的_id
+        const categoryId = this.category._id
 
-      //console.log('发更新请求', categoryName, categoryId)
-      const result = await reqUpdateCategory({ categoryId, categoryName })
-      if (result.status===0) {
-        message.success('更新分类成功')
-        this.getFirstAndTwoColumns()
+        //console.log('发更新请求', categoryName, categoryId)
+        const result = await reqUpdateCategory({ categoryId, categoryName })
+
+        if (result.status===0) {
+          message.success('更新分类成功')
+          this.getFirstAndTwoColumns()
+        }
+
       }
+      
+    })
+  
 
-    }
-    
-  })
- 
+  }
 
-}
+  //添加分类
+  addCategory = ()=>{
+    // 进行表单验证-----子组件传递过来的form才能进行表单验证
+    this.form.validateFields(async(err, values) => {
+      if (!err) { // 只有验证通过才继续
+
+        // 1--隐藏修改界面
+        this.setState({
+          showStatus: 0
+        })
+
+        // 2--得到输入的分类名称parentId, categoryName 
+        const { parentId, categoryName } = this.form.getFieldsValue()
+
+        // 3--重置输入数据
+        this.form.resetFields()
+
+        //4.---- 得到请求的结果
+        const result = await reqAddCategory( parentId, categoryName )
+
+        //5---添加数据
+        if (result.status===0) {
+
+          message.success('添加分类成功')
+
+          //一级列表  -------此时的这里需要去修改getFirstAndTwoColumns，给他一个形参
+          if(parentId==='0'){
+            this.getFirstAndTwoColumns('0')
+          }else if(parentId === this.state.parentId ){ //二级列表
+            this.getFirstAndTwoColumns()
+          }
+
+        }
+
+      }
+      
+    })
+  }
   
   //在render()之前即将挂载-----初始化表格的列
   componentWillMount(){
@@ -159,7 +208,7 @@ updateCategory = () => {
 
     //定义标题------定义card右侧的内容
     const extra =(
-      <Button type='primary'>
+      <Button type='primary' onClick={()=>this.setState({showStatus:2})}>
         <Icon type='plus'></Icon>
         添加
       </Button>
@@ -184,6 +233,7 @@ updateCategory = () => {
           dataSource={parentId==='0' ? categorys : subCategorys}
           pagination={{ defaultPageSize: 5, showQuickJumper: true}}
         />
+
         <Modal
           title="更新分类"
           visible={showStatus===1}
@@ -192,12 +242,22 @@ updateCategory = () => {
         >
           <UpdateForm categoryName={category.name} setForm={(form) => this.form = form}/>
         </Modal>
+
+        <Modal
+          title="添加分类"
+          visible={showStatus===2}
+          onOk={this.addCategory}
+          onCancel={() => this.setState({ showStatus: 0 })}
+        >
+          <AddForm parentId={parentId} categorys={categorys} setForm={(form) => this.form = form}/>
+        </Modal>
+        
       </Card>
     </div>
     )
   }
 }
 // pagination={{ defaultPageSize: 5, showQuickJumper: true}}------每页显示的条数，也是否可以跳转
-//rowKey---表格行key的取值
+//rowKey---表格行  key的取值
 //dataSource----指定表格的数据源，为一个数组
 //columns------几列
