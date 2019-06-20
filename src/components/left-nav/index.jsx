@@ -30,7 +30,7 @@ class LeftNav extends Component {
    }else{  //添加SubMenu
 
     // 如果请求的是当前item的children中某个item对应的path, 当前item的key就是openKey  【打开SubMenu菜单项】
-    const cItem = item.children.find((cItem,index) => cItem.key === path )
+    const cItem = item.children.find((cItem,index) => path.indexOf(cItem.key) === 0 )
     if(cItem){
      this.openKey = item.key  // 当前请求的是某个二级菜单路由
     }

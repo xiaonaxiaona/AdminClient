@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {Card,Button,Icon,Table,Modal,message} from 'antd'
 
 import IsButton from '../../components/isbutton'
-import {reqCategory} from '../../api'
+import {reqCategorys} from '../../api'
 import UpdateForm from './update-form'
 import AddForm from './add-form'
 import {reqUpdateCategory, reqAddCategory } from '../../api'
@@ -49,13 +49,13 @@ state = {
     this.setState({loading:true})  //请求前显示loading
     /*
     const {parentId} = this.state
-    const result = await reqCategory(parentId)  //----获取的parentId的值，是会得到所有的1-2级的数组，
+    const result = await reqCategorys(parentId)  //----获取的parentId的值，是会得到所有的1-2级的数组，
                                                   //因为2级的包在1级里面,先进入1级才会进入2级
     */
 
     //以下是在添加分类需要特殊做的
     const parentId = pid || this.state.parentId
-    const result = await reqCategory(parentId) //添加分类---特殊用的
+    const result = await reqCategorys(parentId) //添加分类---特殊用的
 
     this.setState({loading:false})
     if(result.status===0){

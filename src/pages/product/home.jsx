@@ -48,9 +48,9 @@ export default class ProductHome extends Component {
       {
         title: '操作',
         width: 100,
-        render: (products)=>(
+        render: (product)=>(
           <span>
-            <IsButton>详情</IsButton>
+            <IsButton onClick={()=>{this.props.history.push('/product/detail/' + product._id , product)}}>详情</IsButton>
             <IsButton>修改</IsButton>
           </span>
         )

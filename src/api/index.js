@@ -21,7 +21,7 @@ export const reqLogin = (username, password) => ajax(BASE + '/login', {username,
 export const reqAddUser = (user) => ajax(BASE + '/manage/user/add', user, 'POST')
 
 //商品分类
-export const reqCategory = (parentId) =>ajax(BASE + '/manage/category/list',{parentId})
+export const reqCategorys = (parentId) =>ajax(BASE + '/manage/category/list',{parentId})
 
 //更新分类的名称
 export const reqUpdateCategory = ({categoryId, categoryName}) => ajax(BASE + '/manage/category/update', {categoryId, categoryName}, 'POST')
@@ -48,6 +48,8 @@ export const reqSearchProducts = ({
 //对商品进行状态处理----进行上架/下架处理  在售/下架
 export const reqStateUpdate = (productId,status) => ajax(BASE + '/manage/product/updateStatus',{productId,status},'POST')
 
+//在detail中，根据分类的id获取当前的分类，然后显示
+export const reqCategory = (categoryId) => ajax(BASE + '/manage/category/info',{categoryId})
 
 
 
