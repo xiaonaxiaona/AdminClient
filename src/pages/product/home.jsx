@@ -51,7 +51,7 @@ export default class ProductHome extends Component {
         render: (product)=>(
           <span>
             <IsButton onClick={()=>{this.props.history.push('/product/detail/' + product._id , product)}}>详情</IsButton>
-            <IsButton>修改</IsButton>
+            <IsButton onClick={()=>{this.props.history.push('/product/addupdate',product)}}>修改</IsButton>
           </span>
         )
       },
@@ -133,7 +133,7 @@ export default class ProductHome extends Component {
     )
     //右侧是extra
     const extra = (
-      <Button type='primary'>
+      <Button type='primary' onClick={()=> {this.props.history.push('/product/addupdate')}}>
         <Icon type='plus'></Icon>
         添加商品
       </Button>
