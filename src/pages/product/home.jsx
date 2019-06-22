@@ -4,7 +4,7 @@ import {Card,Select,Input,Button,Icon,Table,message} from 'antd'
 
 import IsButton from '../../components/isbutton';
 import {reqProducts, reqSearchProducts, reqStateUpdate} from '../../api'
-import {PAGE_SIZE} from '../../utils/constains.js'
+import {PAGE_SIZE} from '../../utils/constants.js'
 
 export default class ProductHome extends Component {
   state = {

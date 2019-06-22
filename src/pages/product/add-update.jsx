@@ -5,13 +5,15 @@ import {
   Form,
   Input,
   Button,
-  Cascader,
+  Cascader,  //-----负责多级联动的
   message
 } from 'antd'
 
 import IsButton from '../../components/isbutton'
+import PicturesWall from './pictures-wall'
+import RichTextEditor from './rich-text-editor'
 
-import {reqCategorys} from '../../api'
+import {reqCategorys, reqAddOrUpdateProduct} from '../../api'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -23,6 +25,13 @@ class ProductAddUpdate extends Component {
 
   state = {
     options:[]
+  }
+
+  constructor(props) {
+    super(props);
+    // 创建一个ref对象容器
+    this.pwRef = React.createRef()
+    this.editorRef = React.createRef()
   }
 
   //对价格进行校验---自定义的校验
@@ -61,7 +70,7 @@ class ProductAddUpdate extends Component {
     // 如果当前是更新二级分类的商品, 需要, 获取对应的二级分类列表显示
    const {product, isUpdate} = this
    if(isUpdate && product.pCategoryId !== '0'){
-     const subCategorys = await this.getCategorys(product.pCategoryId)
+     const subCategorys = await this.getCategorys(product.pCategoryId)   
      if(subCategorys && subCategorys.length > 0){
        //在options中找到当前商品对应的option
        const targetOption = options.find(option => option.value === product.pCategoryId)
@@ -116,8 +125,34 @@ class ProductAddUpdate extends Component {
 
   //提交时-----需要进行表单验证
   submit = () => {
-    this.props.form.validateFields((err,values) =>{
+    this.props.form.validateFields(async (err,values) =>{
       if(!err){
+        //读取所有上传图片文件名的数组
+        const imgs = this.pwRef.current.getImgs()
+        // 读取富文本内容(html格式字符串)
+        const detail = this.editorRef.current.getDetail()
+
+        //提交上去 需要一个product对象，传参也需要一个它 {name, desc, price, categoryId, pCategoryId, detail, imgs}
+        const {name, desc, price, categoryIds} = values
+        let pCategoryId , categoryId
+
+        if(categoryIds.length === 0){
+          pCategoryId = '0';
+          categoryId = categoryIds[0]
+        }else{
+          pCategoryId = categoryIds[0];
+          categoryId = categoryIds[1]
+        }
+        //添加与更新的produce 相差一个_id
+        const product = {name, desc, price, categoryId, pCategoryId, detail, imgs}
+        //更新的标识，有值就是更新，他的id值是当前的id,当前传过来的product的id
+        if(this.isUpdate){
+          product._id = this.product._id
+        }
+        const result = await reqAddOrUpdateProduct(product)
+        if(result.status === 0){
+          message.success(this.isUpdate? '更新成功':'添加数据成功')
+        }
 
         console.log('验证通过',values)
       }
@@ -218,19 +253,20 @@ class ProductAddUpdate extends Component {
               })(
                 <Cascader
                   options={this.state.options}
-                  loadData={this.loadData}  //是显示一级与二级列表的
+                  loadData={this.loadData}  //是显示一级与二级列表的,多级联动
                 />
               )
             }
             
           </Item>
           <Item label="商品图片">
-            <span>商品图片列表</span>
+            <PicturesWall ref={this.pwRef} imgs={product.imgs}/>
           </Item>
           <Item
             label="商品详情"
+            wrapperCol = {{ span: 18 }}
           >
-            <span>商品详情信</span>
+            <RichTextEditor ref={this.editorRef} detail={product.detail}/>
           </Item>
           <Button type='primary' onClick={this.submit}>提交</Button>
         </Form>

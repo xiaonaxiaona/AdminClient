@@ -51,6 +51,13 @@ export const reqStateUpdate = (productId,status) => ajax(BASE + '/manage/product
 //在detail中，根据分类的id获取当前的分类，然后显示
 export const reqCategory = (categoryId) => ajax(BASE + '/manage/category/info',{categoryId})
 
+// 删除图片
+export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {name}, 'POST')
+
+//添加/更新商品 -----在add-update中用到  -----由于是传的参数比较多，所以将这一整条数据传递过去
+export const reqAddOrUpdateProduct = (product) => ajax(BASE + '/manage/product/' + (product._id ? "update" : "add"), product, 'POST')
+
+
 
 
 //  简单测试一下的代码

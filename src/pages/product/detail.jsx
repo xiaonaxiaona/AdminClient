@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import {Card, List, Icon} from 'antd'
 
 import IsButton from '../../components/isbutton'
-import {BASE_IMG_URL} from '../../utils/constains'
+import {BASE_IMG_URL} from '../../utils/constants'
 import {reqCategory} from '../../api'
 
 export default class ProductDetail extends Component {
